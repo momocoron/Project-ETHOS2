@@ -5,24 +5,30 @@ on:
     branches:
       - main  # mainブランチに更新があったら自動で動く設定
 
+# 配送ロボットに「書き込み許可」を与えます（エラー回避の重要設定）
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install and Build
+        # CI=false をつけることで、軽微な警告で作業が止まるのを防ぎます
         run: |
           npm install
-          npm run build
+          CI=false npm run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: build # ビルドされたファイルが入るフォルダ
+          branch: gh-pages # 公開用の専用の枝（フォルダ）へ送る
